@@ -6,7 +6,7 @@ const MOVIES = [
   {
     title: 'Thunderstrike',
     genre: 'action',
-    mood: ['adventurous', 'intense', 'excited'],
+    mood: ['adventurous', 'intense', 'excited', 'thrilling'],
     score: '88%',
     runtime: '2h 10m',
     cinema: 'AMC Downtown',
@@ -15,7 +15,7 @@ const MOVIES = [
   {
     title: 'Midnight Scream',
     genre: 'horror',
-    mood: ['scared', 'dark', 'intense'],
+    mood: ['scared', 'dark', 'frightened', 'spooky'],
     score: '84%',
     runtime: '1h 50m',
     cinema: 'Cinema 21',
@@ -24,7 +24,7 @@ const MOVIES = [
   {
     title: 'Forever After',
     genre: 'romance',
-    mood: ['romantic', 'emotional', 'happy'],
+    mood: ['romantic', 'emotional', 'lovey', 'date night'],
     score: '79%',
     runtime: '1h 55m',
     cinema: 'Living Room Theaters',
@@ -33,7 +33,7 @@ const MOVIES = [
   {
     title: 'Brave Little Dino',
     genre: 'animation',
-    mood: ['happy', 'fun', 'cheerful'],
+    mood: ['happy', 'fun', 'cheerful', 'joyful', 'glad', 'lighthearted'],
     score: '95%',
     runtime: '1h 40m',
     cinema: 'Cinemark Eastside',
@@ -42,7 +42,7 @@ const MOVIES = [
   {
     title: 'Echoes of Tomorrow',
     genre: 'sci-fi',
-    mood: ['curious', 'thoughtful', 'deep'],
+    mood: ['curious', 'thoughtful', 'deep', 'mysterious', 'interesting'],
     score: '91%',
     runtime: '2h 5m',
     cinema: 'Regal City Center',
@@ -83,17 +83,26 @@ app.post('/webhook', (req, res) => {
     if (!movie) {
       response = `I couldn't find that movie. I have: ${MOVIES.map(m => m.title).join(', ')}.`;
     } else {
-      response = `${EMOJI[movie.genre]} ${movie.title} | ${movie.genre} | ⭐ ${movie.score} | ${movie.runtime}\n📍 ${movie.cinema}\n🕐 ${movie.times.join(' | ')}\n\nEnjoy the movie! 🍿`;
+      response =
+        `${EMOJI[movie.genre]} ${movie.title} | ${movie.genre} | ⭐ ${movie.score} | ${movie.runtime}\n` +
+        `📍 ${movie.cinema}\n` +
+        `🕐 ${movie.times.join(' | ')}\n\n` +
+        `Enjoy the movie! 🍿`;
     }
   }
 
   else if (intent === 'RecommendMovie') {
     const mood = (params.Mood || 'curious').toLowerCase();
     const movie = MOVIES.find(m => m.mood.includes(mood)) || MOVIES[4];
-    response = `Perfect pick for a ${mood} mood! 🎭\n\n${EMOJI[movie.genre]} ${movie.title} | ${movie.genre} | ⭐ ${movie.score} | ${movie.runtime}\n📍 ${movie.cinema}\n🕐 ${movie.times.join(' | ')}\n\nEnjoy the movie! 🍿`;
+    response =
+      `Perfect pick for a ${mood} mood! 🎭\n\n` +
+      `${EMOJI[movie.genre]} ${movie.title} | ${movie.genre} | ⭐ ${movie.score} | ${movie.runtime}\n` +
+      `📍 ${movie.cinema}\n` +
+      `🕐 ${movie.times.join(' | ')}\n\n` +
+      `Enjoy the movie! 🍿`;
   }
 
-  res.json({fulfillmentText: response});
+  res.json({ fulfillmentText: response });
 });
 
 const PORT = process.env.PORT || 3000;
