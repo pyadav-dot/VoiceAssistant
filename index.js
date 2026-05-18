@@ -59,10 +59,21 @@ const EMOJI = {
 };
 
 function getParam(params, ...keys) {
+  // First check specific keys
   for (const key of keys) {
-    if (params[key]) {
+    if (params[key] && params[key].length > 0) {
       const val = params[key];
       if (Array.isArray(val)) return val[0] || '';
+      return val;
+    }
+  }
+  // Then check ALL params for any non-empty value
+  for (const key of Object.keys(params)) {
+    const val = params[key];
+    if (val && Array.isArray(val) && val.length > 0 && val[0] !== '') {
+      return val[0];
+    }
+    if (val && !Array.isArray(val) && val !== '') {
       return val;
     }
   }
@@ -78,7 +89,8 @@ app.post('/webhook', (req, res) => {
   console.log('Params:', JSON.stringify(params));
 
   if (intent === 'FindMovies') {
-    const genre = getParam(params, 'MovieGenre', 'moviegenre', 'movie-genre').toLowerCase();
+    const genre = getParam(params, 'MovieGenre', 'moviegenre').toLowerCase();
+    console.log('Genre:', genre);
     const list = genre ? MOVIES.filter(m => m.genre === genre) : MOVIES;
     if (!list.length) {
       response = `I don't have any ${genre} movies right now. Try action, horror, romance, sci-fi, or animation!`;
@@ -92,7 +104,7 @@ app.post('/webhook', (req, res) => {
   }
 
   else if (intent === 'GetMovieDetails') {
-    const raw = getParam(params, 'MovieTitle', 'movietitle', 'movie-title').toLowerCase();
+    const raw = getParam(params, 'MovieTitle', 'movietitle').toLowerCase();
     console.log('Movie raw:', raw);
     const movie = MOVIES.find(m => m.title.toLowerCase().includes(raw));
     if (!movie || !raw) {
