@@ -63,8 +63,11 @@ app.post('/webhook', (req, res) => {
   const params = req.body.queryResult.parameters;
   let response = '';
 
+  console.log('Intent:', intent);
+  console.log('Params:', JSON.stringify(params));
+
   if (intent === 'FindMovies') {
-    const genre = (params.MovieGenre || '').toLowerCase();
+    const genre = (params.MovieGenre || params.moviegenre || '').toLowerCase();
     const list = genre ? MOVIES.filter(m => m.genre === genre) : MOVIES;
     if (!list.length) {
       response = `I don't have any ${genre} movies right now. Try action, horror, romance, sci-fi, or animation!`;
@@ -73,37 +76,3 @@ app.post('/webhook', (req, res) => {
       list.forEach(m => {
         response += `${EMOJI[m.genre]} ${m.title} (${m.genre}) → ${m.cinema}\n`;
       });
-      response += `\nWhich movie would you like details on? 🍿`;
-    }
-  }
-
-  else if (intent === 'GetMovieDetails') {
-    const raw = (params.MovieTitle || '').toLowerCase();
-    const movie = MOVIES.find(m => m.title.toLowerCase().includes(raw));
-    if (!movie) {
-      response = `I couldn't find that movie. I have: ${MOVIES.map(m => m.title).join(', ')}.`;
-    } else {
-      response =
-        `${EMOJI[movie.genre]} ${movie.title} | ${movie.genre} | ⭐ ${movie.score} | ${movie.runtime}\n` +
-        `📍 ${movie.cinema}\n` +
-        `🕐 ${movie.times.join(' | ')}\n\n` +
-        `Enjoy the movie! 🍿`;
-    }
-  }
-
-  else if (intent === 'RecommendMovie') {
-    const mood = (params.Mood || 'curious').toLowerCase();
-    const movie = MOVIES.find(m => m.mood.includes(mood)) || MOVIES[4];
-    response =
-      `Perfect pick for a ${mood} mood! 🎭\n\n` +
-      `${EMOJI[movie.genre]} ${movie.title} | ${movie.genre} | ⭐ ${movie.score} | ${movie.runtime}\n` +
-      `📍 ${movie.cinema}\n` +
-      `🕐 ${movie.times.join(' | ')}\n\n` +
-      `Enjoy the movie! 🍿`;
-  }
-
-  res.json({ fulfillmentText: response });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
